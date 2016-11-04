@@ -78,23 +78,29 @@ namespace GridTest
 
 	internal class PropertyCustomCheckCell : CustomCell
 	{
-		public CheckBox checkBox = null;
 		protected override Control OnCreateCell (CellEventArgs args)
 		{
 			var item = (PropertyPOCO)args.Item;
-			checkBox = new CheckBox ();
-			checkBox.CheckedBinding.BindDataContext ((PropertyPOCO m) => m.PropertyCheck);
+			var checkBox = new CheckBox();
+			checkBox.CheckedBinding.BindDataContext((PropertyPOCO m) => m.PropertyCheck);
+
+			// use binding for enabled and visibility properties
+			checkBox.BindDataContext(c => c.Enabled, (PropertyPOCO m) => m.Enabled);
+			checkBox.BindDataContext(c => c.Visible, (PropertyPOCO m) => !m.Group);
 			return checkBox;
 		}
 
+		/* you can do this, but binding is much easier
 		protected override void OnConfigureCell (CellEventArgs args, Control control)
 		{
+			var checkBox = control as CheckBox;
 			if (checkBox != null) {
 				var item = (PropertyPOCO)args.Item;
 				checkBox.Enabled = item.Enabled;
+				checkBox.Visible = !item.Group;
 			}
 			base.OnConfigureCell (args, control);
-		}
+		}*/
 	}
 
 	/// <summary>
@@ -186,28 +192,12 @@ namespace GridTest
 						e.Font = new Font (e.Font.FamilyName, e.Font.Size, FontStyle.Bold);
 					}
 					e.BackgroundColor = Colors.LightGrey;
-					if (e.Column.DataCell.GetType () == typeof (PropertyCustomCheckCell)) {
-						PropertyCustomCheckCell cell = e.Column.DataCell as PropertyCustomCheckCell;
-						if (cell != null) {
-							CheckBox checkBox = cell.checkBox as CheckBox;
-							if (checkBox != null)
-								checkBox.Visible = false;
-						}
-					}
 				} else {
 					if (e.Font != null) {
 						e.Font = new Font (e.Font.FamilyName, e.Font.Size, FontStyle.None);
 					}
-					if (e.Column.DataCell.GetType () == typeof (PropertyCustomCheckCell)) {
-						PropertyCustomCheckCell cell = e.Column.DataCell as PropertyCustomCheckCell;
-						if (cell != null) {
-							CheckBox checkBox = cell.checkBox as CheckBox;
-							if (checkBox != null)
-								checkBox.Visible = true;
-						}
-					}
 				}
 			}
 		}
-}
+	}
 }
